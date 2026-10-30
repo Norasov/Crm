@@ -4,9 +4,9 @@ namespace Application.Interfaces;
 
 public interface IStudentGroupservice
 {
-    void AddStudentGroup(StudentGroup studentGroup);
-    void UpdateStudentGroup(StudentGroup studentGroup);
-    void DeleteStudentGroup(int studentGroupId);
-    void GetStudentGroup(int studentGroupId);
-    void GetAllStudentGroups();
+    Task AddStudentGroupAsync(StudentGroup studentGroup);
+    Task UpdateStudentGroupAsync(StudentGroup studentGroup);
+    Task DeleteStudentGroupAsync(int studentGroupId);
+    Task GetStudentGroupAsync(int studentGroupId);
+    Task GetAllStudentGroupsAsync();
 }

@@ -1,13 +1,13 @@
 using Domain.Models;
 namespace Application.Interfaces;
 
-public interface IGroupservice
+public interface IGroupService
 {
-    void AddGroup(Group group);
-    void UpdateGroup(Group group);
-    void DeleteGroup(int groupId);
-    void GetGroup(int groupId);
-    void GetAllGroups();
-    void GetStudentsPerGroup();
-    void GetemptyGroups();
+    Task AddGroupAsync(Group group);
+    Task UpdateGroupAsync(Group group);
+    Task DeleteGroupAsync(int groupId);
+    Task GetGroupAsync(int groupId);
+    Task GetAllGroupsAsync();
+    Task GetStudentsPerGroupAsync();
+    Task GetEmptyGroupsAsync();
 }

@@ -1,40 +1,39 @@
 using Application.Interfaces;
 using Domain.Models;
-using Infrastructure.Data;
 using Infrastructure.Repositories;
 
 
-namespace Application.Services;
+namespace Infrastructure.Services;
 
 public class StudentService(StudentRepository studentRepository) : IStudentService
 {
     private readonly StudentRepository _repository = studentRepository;
-    public void AddStudent(Student student)
+    public async Task AddStudentAsync(Student student)
     {
-        var addStudent = _repository.AddStudent(student);
+        var addStudent = await _repository.AddStudentAsync(student);
         if (addStudent) System.Console.WriteLine("Added Successfuly!");
         else System.Console.WriteLine("Something went wrong!");
     }
 
-    public void DeleteStudent(int studentId)
+    public async Task DeleteStudentAsync(int studentId)
     {
-        var deleteStudent = _repository.DeleteStudent(studentId);
+        var deleteStudent = await _repository.DeleteStudentAsync(studentId);
         if (deleteStudent) System.Console.WriteLine("Deleted successfuly!");
         else System.Console.WriteLine("Something went wrong");
     }
 
-    public void GetAllStudents()
+    public async Task GetAllStudentsAsync()
     {
-        var getStudents = _repository.GetStudents();
+        var getStudents = await _repository.GetStudentsAsync();
         foreach (var item in getStudents)
         {
             System.Console.WriteLine(item.StudentId + " | " + item.FullName + " | " + item.Email + " | " + item.Phone + " | " + item.EnrollmentDate);
         }
     }
 
-    public void GetDroppedOutStudents()
+    public async Task GetDroppedOutStudentsAsync()
     {
-        var students = _repository.GetDroppedOutStudents();
+        var students = await _repository.GetDroppedOutStudentsAsync();
         if (students.Count == 0)
         {
             Console.WriteLine("Отчисленных студентов нет.");
@@ -47,9 +46,9 @@ public class StudentService(StudentRepository studentRepository) : IStudentServi
         }
     }
 
-    public void GetGraduatedStudents()
+    public async Task GetGraduatedStudentsAsync()
     {
-        var students = _repository.GetGraduatedStudents();
+        var students = await _repository.GetGraduatedStudentsAsync();
         if (students.Count == 0)
         {
             Console.WriteLine("Завершивших курс студентов нет.");
@@ -63,17 +62,16 @@ public class StudentService(StudentRepository studentRepository) : IStudentServi
 
     }
 
-
-    public void GetStudent(int studentId)
+    public async Task GetStudentAsync(int studentId)
     {
-        var getStudent = _repository.GetStudent(studentId);
-        System.Console.WriteLine(getStudent.StudentId + " | " + getStudent.FullName + " | " + getStudent.Email + " | " + getStudent.Phone + " | " + getStudent.EnrollmentDate);
-
+        var getStudent = await _repository.GetStudentAsync(studentId);
+        if(getStudent is null) System.Console.WriteLine("Студент не найден!");
+        else System.Console.WriteLine(getStudent.StudentId + " | " + getStudent.FullName + " | " + getStudent.Email + " | " + getStudent.Phone + " | " + getStudent.EnrollmentDate);
     }
 
-    public void GetStudentsWithGroups()
+    public async Task GetStudentsWithGroupsAsync()
     {
-        var studentWithGroups = _repository.GetStudentsWithGroups();
+        var studentWithGroups = await _repository.GetStudentsWithGroupsAsync();
         if (studentWithGroups.Count == 0)
         {
             Console.WriteLine("Данных нет.");
@@ -85,9 +83,9 @@ public class StudentService(StudentRepository studentRepository) : IStudentServi
 
     }
 
-    public void GetStudentsWithoutGroups()
+    public async Task GetStudentsWithoutGroupsAsync()
     {
-        var students = _repository.GetStudentsWithoutGroups();
+        var students = await _repository.GetStudentsWithoutGroupsAsync();
         if (students.Count == 0)
         {
             Console.WriteLine("Все студенты записаны в группы.");
@@ -101,9 +99,9 @@ public class StudentService(StudentRepository studentRepository) : IStudentServi
     }
 
 
-    public void UpdateStudent(Student student)
+    public async Task UpdateStudentAsync(Student student)
     {
-        var updateStudent = _repository.UpdateStudent(student);
+        var updateStudent = await _repository.UpdateStudentAsync(student);
         if (updateStudent) System.Console.WriteLine("Updated successfuly!");
         else System.Console.WriteLine("Something went wrong!");
     }

@@ -6,5 +6,5 @@ public class Student
     public string FullName {get;set;}=null!;
     public string Email {get;set;}=null!;
     public string Phone {get;set;} =null!;
-    public DateTime EnrollmentDate {get;set;}
+    public DateOnly EnrollmentDate {get;set;}
 }

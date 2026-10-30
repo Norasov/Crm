@@ -8,62 +8,64 @@ namespace Infrastructure.Repositories;
 public class CourseRepository(AppDbContext context) : ICourseRepository
 {
     private readonly AppDbContext _context = context;
-    public bool AddCourse(Course course)
+    public async Task<bool> AddCourseAsync(Course course)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = @"insert into Courses(Title, Description, DurationWeeks) values
         (@Title, @Description, @DurationWeeks)";
-        int rowsAdded = connection.Execute(query, course);
+        int rowsAdded = await connection.ExecuteAsync(query, course);
         return rowsAdded > 0;
     }
 
-    public bool DeleteCourse(int courseId)
+    public async Task<bool> DeleteCourseAsync(int courseId)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "delete from courses where CourseId = @CourseId";
-        int rowsChanged = connection.Execute(query, new { courseId });
+        int rowsChanged = await connection.ExecuteAsync(query, new { courseId });
         return rowsChanged > 0;
     }
 
-    public Course GetCourse(int courseId)
+    public async Task<Course?> GetCourseAsync(int courseId)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "select * from courses where CourseId = @CourseId";
-        return connection.QueryFirst<Course>(query, new { courseId });
+        return await connection.QueryFirstOrDefaultAsync<Course>(query, new { courseId });
     }
 
-    public List<Course> GetCourses()
+    public async Task<List<Course>> GetCoursesAsync()
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "select * from courses";
-        return connection.Query<Course>(query).ToList();
+        var list = await connection.QueryAsync<Course>(query);
+        return list.ToList();
     }
 
-    public List<CourseStudentCount> GetLeastPopularCourses()
+    public async Task<List<CourseStudentCount>> GetLeastPopularCoursesAsync()
     {
         using var connection = _context.Connection();
-        var query = @"SELECT c.CourseId, c.CourseName, COUNT(DISTINCT sg.StudentId) AS StudentCount
+        var query = @"SELECT c.CourseId, c.Title, COUNT(DISTINCT sg.StudentId) AS StudentCount
         FROM courses c
         LEFT JOIN groups g ON g.CourseId = c.CourseId
         LEFT JOIN studentgroups sg ON sg.GroupId = g.GroupId
-        GROUP BY c.CourseId, c.CourseName
+        GROUP BY c.CourseId, c.Title
         ORDER BY StudentCount ASC, c.CourseId
         LIMIT 3";
-        return connection.Query<CourseStudentCount>(query).ToList();
+        var list = await connection.QueryAsync<CourseStudentCount>(query);
+        return list.ToList();
     }
 
-    public List<CourseStudentCount> GetMostPopularCourse()
+    public async Task<List<CourseStudentCount>> GetMostPopularCourseAsync()
     {
         using var connection = _context.Connection();
-        var query = @"SELECT c.CourseId, c.CourseName, COUNT(DISTINCT sg.StudentId) AS StudentCount
+        var query = @"SELECT c.CourseId, c.Title, COUNT(DISTINCT sg.StudentId) AS StudentCount
         FROM courses c
         JOIN groups g ON g.CourseId = c.CourseId
         JOIN studentgroups sg ON sg.GroupId = g.GroupId
-        GROUP BY c.CourseId, c.CourseName
+        GROUP BY c.CourseId, c.Title
         HAVING COUNT(DISTINCT sg.StudentId) = (
             SELECT MAX(cnt) FROM (
                 SELECT COUNT(DISTINCT sg2.StudentId) AS cnt
@@ -72,36 +74,39 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
                 GROUP BY g2.CourseId
             ) t
         )";
-        return connection.Query<CourseStudentCount>(query).ToList();
+        var list = await connection.QueryAsync<CourseStudentCount>(query);
+        return list.ToList();
     }
 
-    public List<CourseStudentCount> GetStudentsPerCourse()
+    public async Task<List<CourseStudentCount>> GetStudentsPerCourseAsync()
     {
         using var connection = _context.Connection();
-        var query = @"SELECT c.CourseId, c.CourseName, COUNT(DISTINCT sg.StudentId) AS StudentCount
+        var query = @"SELECT c.CourseId, c.Title, COUNT(DISTINCT sg.StudentId) AS StudentCount
         FROM courses c
         LEFT JOIN groups g ON g.CourseId = c.CourseId
         LEFT JOIN studentgroups sg ON sg.GroupId = g.GroupId
-        GROUP BY c.CourseId, c.CourseName
+        GROUP BY c.CourseId, c.Title
         ORDER BY c.CourseId";
-        return connection.Query<CourseStudentCount>(query).ToList();
+        var list = await connection.QueryAsync<CourseStudentCount>(query);
+        return list.ToList();
     }
 
-    public List<CourseStudentCount> GetTopThreeCourses()
+    public async Task<List<CourseStudentCount>> GetTopThreeCoursesAsync()
     {
         using var connection = _context.Connection();
-        var query = @"SELECT c.CourseId, c.Title as CourseName, COUNT(DISTINCT sg.StudentId) AS StudentCount
+        var query = @"SELECT c.CourseId, c.Title, COUNT(DISTINCT sg.StudentId) AS StudentCount
         FROM courses c
         LEFT JOIN groups g ON g.CourseId = c.CourseId
         LEFT JOIN studentgroups sg ON sg.GroupId = g.GroupId
         GROUP BY c.CourseId, c.Title
         ORDER BY StudentCount DESC, c.CourseId
         LIMIT 3";
-        return connection.Query<CourseStudentCount>(query).ToList();
+        var list = await connection.QueryAsync<CourseStudentCount>(query);
+        return list.ToList();
     }
 
 
-    public bool UpdateCourse(Course course)
+    public async Task<bool> UpdateCourseAsync(Course course)
     {
         using var connection = _context.Connection();
         connection.Open();
@@ -109,8 +114,7 @@ public class CourseRepository(AppDbContext context) : ICourseRepository
         Description=@Description, 
         DurationWeeks = @DurationWeeks
         where CourseId = @CourseId";
-        int rowsChanged = connection.Execute(query, new { course });
+        int rowsChanged = await connection.ExecuteAsync(query, course);
         return rowsChanged > 0;
     }
-
 }

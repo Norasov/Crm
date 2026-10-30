@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Domain.Interfaces;
 using Domain.Models;
 using Infrastructure.Repositories;
 
@@ -9,37 +8,38 @@ public class MentorService(MentorRepository repository) : IMentorService
 {
     private readonly MentorRepository _repository = repository;
 
-    public void AddMentor(Mentor mentor)
+    public async Task AddMentorAsync(Mentor mentor)
     {
-        var addMentor = _repository.AddMentor(mentor);
+        var addMentor = await _repository.AddMentorAsync(mentor);
         System.Console.WriteLine(addMentor ? "Added succesfuly!" : "Something went wrong!");
 
     }
 
-    public void DeleteMentor(int mentorId)
+    public async Task DeleteMentorAsync(int mentorId)
     {
-        var deleteMentor = _repository.DeleteMentor(mentorId);
+        var deleteMentor = await _repository.DeleteMentorAsync(mentorId);
         System.Console.WriteLine(deleteMentor ? "Deleted Successfuly!" : "Something went wrong");
     }
 
-    public void GetAllMentors()
+    public async Task GetAllMentorsAsync()
     {
-        var getMentors = _repository.GetMentors();
+        var getMentors = await _repository.GetMentorsAsync();
         foreach (var item in getMentors)
         {
             System.Console.WriteLine(item.MentorId + " | " + item.FullName + " | " + item.Phone + " | " + item.Specialization + " | " + item.Email);
         }
     }
 
-    public void GetMentor(int mentorId)
+    public async Task GetMentorAsync(int mentorId)
     {
-        var getMentor = _repository.GetMentor(mentorId);
-        System.Console.WriteLine(getMentor.MentorId + " | " + getMentor.FullName + " | " + getMentor.Phone + " | " + getMentor.Specialization + " | " + getMentor.Email);
+        var getMentor = await _repository.GetMentorAsync(mentorId);
+        if(getMentor is null) System.Console.WriteLine("Ментор не найден!");
+        else System.Console.WriteLine(getMentor.MentorId + " | " + getMentor.FullName + " | " + getMentor.Phone + " | " + getMentor.Specialization + " | " + getMentor.Email);
     }
 
-    public void GetMentorsWithMultipleCourses()
+    public async Task GetMentorsWithMultipleCoursesAsync()
     {
-        var mentors = _repository.GetMentorsWithMultipleCourses();
+        var mentors = await _repository.GetMentorsWithMultipleCoursesAsync();
         if (mentors.Count == 0)
         {
             System.Console.WriteLine("Наставников с несколькими курсами нет.");
@@ -51,9 +51,9 @@ public class MentorService(MentorRepository repository) : IMentorService
         }
     }
 
-    public void GetMentorWithMostStudents()
+    public async Task GetMentorWithMostStudentsAsync()
     {
-        var mentors = _repository.GetMentorWithMostStudents();
+        var mentors = await _repository.GetMentorWithMostStudentsAsync();
         if (mentors.Count == 0)
         {
             Console.WriteLine("Данных нет.");
@@ -67,9 +67,9 @@ public class MentorService(MentorRepository repository) : IMentorService
     }
 
 
-    public void UpdateMentor(Mentor mentor)
+    public async Task UpdateMentorAsync(Mentor mentor)
     {
-        var updateMentor = _repository.UpdateMentor(mentor);
+        var updateMentor = await _repository.UpdateMentorAsync(mentor);
         System.Console.WriteLine(updateMentor ? "Updated successfuly!" : "Something went wrong!");
     }
 }

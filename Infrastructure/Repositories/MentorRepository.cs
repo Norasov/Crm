@@ -8,42 +8,43 @@ namespace Infrastructure.Repositories;
 public class MentorRepository(AppDbContext context) : IMentorRepository
 {
     private readonly AppDbContext _context = context;
-    public bool AddMentor(Mentor mentor)
+    public async Task<bool> AddMentorAsync(Mentor mentor)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = @"insert into mentors(FullName, Email, Phone, Specialization) values
         (@FullName, @Email, @Phone, @Specialization)";
-        int rowsAdded = connection.Execute(query, mentor);
+        int rowsAdded = await connection.ExecuteAsync(query, mentor);
         return rowsAdded > 0;
     }
 
-    public bool DeleteMentor(int mentorId)
+    public async Task<bool> DeleteMentorAsync(int mentorId)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "delete from mentors where MentorId = @MentorId";
-        int rowsChanged = connection.Execute(query, new { mentorId });
+        int rowsChanged = await connection.ExecuteAsync(query, new { mentorId });
         return rowsChanged > 0;
     }
 
-    public Mentor GetMentor(int mentorId)
+    public async Task<Mentor?> GetMentorAsync(int mentorId)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "select * from mentors where MentorId = @MentorId";
-        return connection.QueryFirstOrDefault<Mentor>(query, new { mentorId })!;
+        return await connection.QueryFirstOrDefaultAsync<Mentor>(query, new { mentorId });
     }
 
-    public List<Mentor> GetMentors()
+    public async Task<List<Mentor>> GetMentorsAsync()
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "select * from mentors";
-        return connection.Query<Mentor>(query).ToList();
+        var list = await connection.QueryAsync<Mentor>(query);
+        return list.ToList();
     }
 
-    public List<MentorCourseCount> GetMentorsWithMultipleCourses()
+    public async Task<List<MentorCourseCount>> GetMentorsWithMultipleCoursesAsync()
     {
         using var connection = _context.Connection();
         connection.Open();
@@ -53,10 +54,11 @@ public class MentorRepository(AppDbContext context) : IMentorRepository
         GROUP BY m.MentorId, m.FullName
         HAVING COUNT(DISTINCT g.CourseId) > 1
         ORDER BY CourseCount DESC";
-        return connection.Query<MentorCourseCount>(query).ToList();
+        var list = await connection.QueryAsync<MentorCourseCount>(query);
+        return list.ToList();
     }
 
-    public List<MentorStudentCount> GetMentorWithMostStudents()
+    public async Task<List<MentorStudentCount>> GetMentorWithMostStudentsAsync()
     {
         using var connection = _context.Connection();
         connection.Open();
@@ -73,18 +75,19 @@ public class MentorRepository(AppDbContext context) : IMentorRepository
                 GROUP BY g2.MentorId
                     ) t
                 )";
-        return connection.Query<MentorStudentCount>(query).ToList();
+        var list = await connection.QueryAsync<MentorStudentCount>(query);
+        return list.ToList();
     }
 
 
-    public bool UpdateMentor(Mentor mentor)
+    public async Task<bool> UpdateMentorAsync(Mentor mentor)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = @"update mentors set FullName = @FullName, Email=@Email,
         Phone=@Phone, Specialization=@Specialization
         where MentorId = @MentorId";
-        int rowsChanged = connection.Execute(query, new { mentor });
+        int rowsChanged = await connection.ExecuteAsync(query, mentor);
         return rowsChanged > 0;
     }
 }

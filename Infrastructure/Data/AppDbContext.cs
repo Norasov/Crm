@@ -5,6 +5,6 @@ namespace Infrastructure.Data;
 
 public class AppDbContext
 {
-    public string connectionString = "Host=localhost;Port=5432;Database=Crm;Username=postgres;Password=p000";
+    private readonly string connectionString = "Host=localhost;Port=5432;Database=Crm;Username=postgres;Password=p000";
     public IDbConnection Connection() => new NpgsqlConnection(connectionString);
 }

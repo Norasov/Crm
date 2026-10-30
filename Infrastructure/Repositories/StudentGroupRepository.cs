@@ -8,42 +8,43 @@ namespace Infrastructure.Repositories;
 public class StudentGroupRepository(AppDbContext context) : IStudentGroupRepository
 {
     private readonly AppDbContext _context = context;
-    public bool AddStudentGroup(StudentGroup studentGroup)
+    public async Task<bool> AddStudentGroupAsync(StudentGroup studentGroup)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = @"insert into studentgroups(StudentId, GroupId, Status) values
         (@StudentId, @GroupId, @Status)";
-        int rowsAdded = connection.Execute(query, studentGroup);
+        int rowsAdded = await connection.ExecuteAsync(query, studentGroup);
         return rowsAdded > 0;
     }
 
-    public bool DeleteStudentGroup(int studentGroupId)
+    public async Task<bool> DeleteStudentGroupAsync(int studentGroupId)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "delete from studentgroups where StudentGroupId = @StudentGroupId";
-        int rowsChanged = connection.Execute(query,new{studentGroupId});
+        int rowsChanged = await connection.ExecuteAsync(query,new{studentGroupId});
         return rowsChanged > 0;
     }
 
-    public StudentGroup GetStudentGroup(int studentGroupId)
+    public async Task<StudentGroup?> GetStudentGroupAsync(int studentGroupId)
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "select * from StudentGroups where StudentGroupId = @StudentGroupId";
-        return connection.QueryFirstOrDefault<StudentGroup>(query,new{studentGroupId})!;
+        return await connection.QueryFirstOrDefaultAsync<StudentGroup>(query,new{studentGroupId});
     }
 
-    public List<StudentGroup> GetStudentGroups()
+    public async Task<List<StudentGroup>> GetStudentGroupsAsync()
     {
         using var connection = _context.Connection();
         connection.Open();
         var query = "select * from StudentGroups";
-        return connection.Query<StudentGroup>(query).ToList();
+        var list = await connection.QueryAsync<StudentGroup>(query);
+        return list.ToList();
     }
 
-    public bool UpdateStudentGroup(StudentGroup studentGroup)
+    public async Task<bool> UpdateStudentGroupAsync(StudentGroup studentGroup)
     {
         using var connection = _context.Connection();
         connection.Open();
@@ -51,8 +52,7 @@ public class StudentGroupRepository(AppDbContext context) : IStudentGroupReposit
         GroupId = @GroupId,
         Status= @Status 
         where StudentGroupId = @StudentGroupId";
-        int rowsChanged = connection.Execute(query,new{studentGroup});
+        int rowsChanged = await connection.ExecuteAsync(query,studentGroup);
         return rowsChanged > 0;
     }
-
 }
